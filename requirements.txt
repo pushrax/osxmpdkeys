@@ -1,0 +1,2 @@
+osxmmkeys>=0.0.2
+python-mpd2>=0.5
