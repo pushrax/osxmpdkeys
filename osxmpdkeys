@@ -9,5 +9,9 @@ parser.add_argument('--port', type=int, help='mpd host port', default=6600)
 
 args = parser.parse_args()
 c = Client(args.host, args.port)
-c.run()
+
+try:
+    c.start()
+except (KeyboardInterrupt, SystemExit):
+    c.stop()
 

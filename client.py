@@ -1,36 +1,43 @@
+import time
 import osxmmkeys
 from mpd import MPDClient
 
 
 class Client(object):
     def __init__(self, host='localhost', port=6600):
-        self.client = MPDClient()
-        self.client.timeout = 10
-        self.host = host
-        self.port = port
+        self._mpd_client = MPDClient()
+        self._mpd_client.timeout = 10
 
-    def run(self):
-        self.client.connect(self.host, self.port)
+        self._host = host
+        self._port = port
 
-        tap = osxmmkeys.Tap()
-        tap.on('play_pause', self.play_pause)
-        tap.on('next_track', self.next_track)
-        tap.on('prev_track', self.prev_track)
-        tap.run()
+        tap = self._tap = osxmmkeys.Tap()
+        tap.on('play_pause', self._play_pause)
+        tap.on('next_track', self._next_track)
+        tap.on('prev_track', self._prev_track)
+
+    def start(self):
+        self._mpd_client.connect(self._host, self._port)
+        self._tap.start()
+
+        while True:
+            self._mpd_client.status()  # Keep connection alive.
+            time.sleep(1)
 
     def stop(self):
-        self.client.close()
-        self.client.disconnect()
+        self._mpd_client.close()
+        self._mpd_client.disconnect()
+        self._tap.stop()
 
-    def play_pause(self):
-        self.client.pause()
+    def _play_pause(self):
+        self._mpd_client.pause()
         return False
 
-    def next_track(self):
-        self.client.next()
+    def _next_track(self):
+        self._mpd_client.next()
         return False
 
-    def prev_track(self):
-        self.client.previous()
+    def _prev_track(self):
+        self._mpd_client.previous()
         return False
 
