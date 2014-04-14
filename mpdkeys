@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import argparse
-from client import Client
+from osxmpdkeys import Client
 
 
 parser = argparse.ArgumentParser(description='Control MPD with media keys.')
