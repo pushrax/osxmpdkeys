@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+import argparse
+from client import Client
+
+
+parser = argparse.ArgumentParser(description='Control MPD with media keys.')
+parser.add_argument('--host', help='mpd host address', default='localhost')
+parser.add_argument('--port', type=int, help='mpd host port', default=6600)
+
+args = parser.parse_args()
+c = Client(args.host, args.port)
+c.run()
+
