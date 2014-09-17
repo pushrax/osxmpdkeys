@@ -40,29 +40,32 @@ class Client(object):
         self._tap.start()
         self._running = True
 
-        tries = 0
+        self._retries = 0
         print('Connecting...')
 
         while self._running:
-            try:
-                self._mpd_client.connect(self._host, self._port)
-                self._connected = True
+            self._connect_and_run()
 
-                print('Connected.')
-                tries = 0
-                self._run()
-            except (mpd.ConnectionError, socket.timeout, socket.error), e:
-                if self._connected:
-                    print('Disconnected...')
+    def _connect_and_run(self):
+        try:
+            self._mpd_client.connect(self._host, self._port)
+            print('Connected.')
 
-            try:
-                self._connected = False
-                self._mpd_client.disconnect()
-            except mpd.ConnectionError:
-                pass
+            self._connected = True
+            self._retries = 0
+            self._run()
+        except (mpd.ConnectionError, socket.timeout, socket.error):
+            if self._connected:
+                print('Disconnected...')
 
-            tries += 1
-            time.sleep(tries if tries < 20 else 20)
+        try:
+            self._connected = False
+            self._mpd_client.disconnect()
+        except mpd.ConnectionError:
+            pass
+
+        self._retries += 1
+        time.sleep(self._retries if self._retries < 20 else 20)
 
     def _run(self):
         while len(self._queue) > 0:
