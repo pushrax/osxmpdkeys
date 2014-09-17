@@ -1,43 +1,80 @@
 import time
 import osxmmkeys
-from mpd import MPDClient
+import mpd
+import socket
+import collections
 
 
 class Client(object):
     def __init__(self, host='localhost', port=6600):
-        self._mpd_client = MPDClient()
-        self._mpd_client.timeout = 10
+        mpd_client = self._mpd_client = mpd.MPDClient()
+        mpd_client.timeout = 3
 
+        def perform(fn):
+            if self._connected:
+                fn()
+            else:
+                self._queue.append(fn)
+            return False
+
+        def play_pause():
+            return perform(mpd_client.pause)
+
+        def next_track():
+            return perform(mpd_client.next)
+
+        def prev_track():
+            return perform(mpd_client.previous)
+
+        self._connected = False
+        self._queue = collections.deque()
         self._host = host
         self._port = port
 
         tap = self._tap = osxmmkeys.Tap()
-        tap.on('play_pause', self._play_pause)
-        tap.on('next_track', self._next_track)
-        tap.on('prev_track', self._prev_track)
+        tap.on('play_pause', play_pause)
+        tap.on('next_track', next_track)
+        tap.on('prev_track', prev_track)
 
     def start(self):
-        self._mpd_client.connect(self._host, self._port)
         self._tap.start()
+        self._running = True
 
-        while True:
+        tries = 0
+        print('Connecting...')
+
+        while self._running:
+            try:
+                self._mpd_client.connect(self._host, self._port)
+                self._connected = True
+
+                print('Connected.')
+                tries = 0
+                self._run()
+            except (mpd.ConnectionError, socket.timeout, socket.error), e:
+                if self._connected:
+                    print('Disconnected...')
+
+            try:
+                self._connected = False
+                self._mpd_client.disconnect()
+            except mpd.ConnectionError:
+                pass
+
+            tries += 1
+            time.sleep(tries if tries < 20 else 20)
+
+    def _run(self):
+        while len(self._queue) > 0:
+            self._queue.popleft()()
+
+        while self._running:
             self._mpd_client.status()  # Keep connection alive.
             time.sleep(1)
 
     def stop(self):
+        self._running = False
         self._mpd_client.close()
         self._mpd_client.disconnect()
         self._tap.stop()
-
-    def _play_pause(self):
-        self._mpd_client.pause()
-        return False
-
-    def _next_track(self):
-        self._mpd_client.next()
-        return False
-
-    def _prev_track(self):
-        self._mpd_client.previous()
-        return False
 
