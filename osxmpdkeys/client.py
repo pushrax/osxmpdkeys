@@ -14,13 +14,21 @@ class Client(object):
             fn() if self._connected else self._queue.append(fn)
             return False
 
+        def play_pause():
+            status = mpdc.status()
+
+            if status and status['state'] == 'stop':
+                mpdc.play(status.get('song', 0))
+            else:
+                mpdc.pause()
+
         self._connected = False
         self._queue = collections.deque()
         self._host = host
         self._port = port
 
         tap = self._tap = osxmmkeys.Tap()
-        tap.on('play_pause', lambda: perform(mpdc.pause))
+        tap.on('play_pause', lambda: perform(play_pause))
         tap.on('next_track', lambda: perform(mpdc.next))
         tap.on('prev_track', lambda: perform(mpdc.previous))
 
