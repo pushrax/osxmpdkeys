@@ -1,3 +1,0 @@
-osxmmkeys>=0.0.3
-python-mpd2>=0.5
-argparse

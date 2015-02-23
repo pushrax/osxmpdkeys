@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='osxmpdkeys',
-    version='0.0.4',
+    version='0.0.5',
     description='Control mpd with the OS X media keys.',
     long_description=open('README.rst').read(),
     author='Justin Li',
@@ -14,6 +14,11 @@ setup(
     ],
     scripts=[
         'mpdkeys'
+    ],
+    install_requires=[
+        'osxmmkeys>=0.0.4',
+        'python-mpd2>=0.5',
+        'argparse',
     ],
     package_data={'': ['LICENSE']},
     include_package_data=True,
