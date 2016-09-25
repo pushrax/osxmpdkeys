@@ -15,7 +15,7 @@ class Client(object):
                 fn() if self._connected else self._queue.append(fn)
             except mpd.ProtocolError as exc:
                 print(
-                    "Got an exception while excuting command '%s': %s" % (
+                    "Got an exception while executing command '%s': %s" % (
                         fn.__name__, exc
                     )
                 )

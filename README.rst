@@ -32,12 +32,12 @@ In the simplest case, just run ``mpdkeys``. The default address is ``localhost:6
     --host HOST  mpd host address
     --port PORT  mpd host port
 
-You can create a LaunchAgent which automatically starts mpdkeys upon login:
-
+If you want to have mpdkeys start automatically upon login,
+you can create a LaunchAgent like so:
 
 .. code::
 
-  $ cat <<EOF> ~/Library/LaunchAgents/com.github.pushrax.osxmpedkeys.plist
+  $ cat <<EOF> ~/Library/LaunchAgents/com.github.pushrax.osxmpdkeys.plist
 
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -55,3 +55,4 @@ You can create a LaunchAgent which automatically starts mpdkeys upon login:
   </plist>
   EOF
 
+Next time you log in, launchd will pick up the configuration automatically.
