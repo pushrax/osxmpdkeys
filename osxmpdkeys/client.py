@@ -11,7 +11,14 @@ class Client(object):
         mpdc.timeout = 3
 
         def perform(fn):
-            fn() if self._connected else self._queue.append(fn)
+            try:
+                fn() if self._connected else self._queue.append(fn)
+            except mpd.ProtocolError as exc:
+                print(
+                    "Got an exception while excuting command '%s': %s" % (
+                        fn.__name__, exc
+                    )
+                )
             return False
 
         def play_pause():
