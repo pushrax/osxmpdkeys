@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='osxmpdkeys',
-    version='1.0.0',
+    version='1.0.1',
     description='Control mpd with the OS X media keys.',
     long_description=open('README.rst').read(),
     author='Justin Li',
