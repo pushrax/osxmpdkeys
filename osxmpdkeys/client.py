@@ -13,7 +13,7 @@ class Client(object):
         def perform(fn):
             try:
                 fn() if self._connected else self._queue.append(fn)
-            except mpd.ProtocolError as exc:
+            except mpd.MPDError as exc:
                 print(
                     "Got an exception while executing command '%s': %s" % (
                         fn.__name__, exc
