@@ -78,7 +78,15 @@ class Client(object):
 
     def _run(self):
         while len(self._queue) > 0:
-            self._queue.popleft()()
+            fn = self._queue.popleft()
+            try:
+                fn()
+            except mpd.MPDError as exc:
+                print(
+                    "Got an exception while executing command '%s': %s" % (
+                        fn.__name__, exc
+                    )
+                )
 
         while self._running:
             self._mpd_client.status()  # Keep connection alive.
